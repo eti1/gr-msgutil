@@ -9,11 +9,11 @@
  * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
+ * along with this software; see the file COPYING.	If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
  * Boston, MA 02110-1301, USA.
  */
@@ -32,35 +32,35 @@
 #define MSGSRC_DBG(a...)
 
 namespace gr {
-  namespace msgutil {
+	namespace msgutil {
 
-    msgsrc::sptr
-    msgsrc::make(size_t itemsize, const std::string &tag_start, const std::string &tag_end, msg_queue::sptr msgq)
-    {
-      return gnuradio::get_initial_sptr
-        (new msgsrc_impl(itemsize, tag_start, tag_end, msgq));
-    }
+		msgsrc::sptr
+		msgsrc::make(size_t itemsize, const std::string &tag_start, const std::string &tag_end, msg_queue::sptr msgq)
+		{
+			return gnuradio::get_initial_sptr
+				(new msgsrc_impl(itemsize, tag_start, tag_end, msgq));
+		}
 
-    msgsrc_impl::msgsrc_impl(size_t itemsize, const std::string &tag_start, const std::string &tag_end, msg_queue::sptr msgq)
-      : gr::sync_block("msgsrc",
-              gr::io_signature::make(0, 0, 0),
-              gr::io_signature::make(1, 1, itemsize)),
+		msgsrc_impl::msgsrc_impl(size_t itemsize, const std::string &tag_start, const std::string &tag_end, msg_queue::sptr msgq)
+			: gr::sync_block("msgsrc",
+							gr::io_signature::make(0, 0, 0),
+							gr::io_signature::make(1, 1, itemsize)),
 				d_itemsize(itemsize),
 				d_tag_start(pmt::string_to_symbol(tag_start)),
 				d_tag_end(pmt::string_to_symbol(tag_end)),
 				d_msgq(msgq), d_msg_pos(0), d_eof(false)
-    {
+		{
 				MSGSRC_DBG("start tag: %s, end tag: %s\n",tag_start.c_str(), tag_end.c_str());
 		}
 
-    msgsrc_impl::~msgsrc_impl()  {  }
+		msgsrc_impl::~msgsrc_impl()	{	}
 
-    int
-    msgsrc_impl::work(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-      void *out = output_items[0];
+		int
+		msgsrc_impl::work(int noutput_items,
+				gr_vector_const_void_star &input_items,
+				gr_vector_void_star &output_items)
+		{
+			void *out = output_items[0];
 			int oo = 0;
 			size_t cnt;
 
@@ -107,9 +107,9 @@ namespace gr {
 				d_msg_pos = 0;
 				MSGSRC_DBG("got message\n");
 			}
-      return oo;
-    }
+			return oo;
+		}
 
-  } /* namespace msgutil */
+	} /* namespace msgutil */
 } /* namespace gr */
 
