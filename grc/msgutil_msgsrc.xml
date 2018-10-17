@@ -1,0 +1,59 @@
+<block>
+  <name>Msgsrc</name>
+  <key>msgutil_msgsrc</key>
+  <category>[MSGUTIL]</category>
+  <import>import msgutil</import>
+  <make>msgutil.msgsrc($type.size*$vlen, $tag_start, $tag_end, $(id)_msgq_in)</make>
+	<param>
+		<name>Input Type</name>
+		<key>type</key>
+		<type>enum</type>
+		<option>
+			<name>Complex</name>
+			<key>complex</key>
+			<opt>size:gr.sizeof_gr_complex</opt>
+		</option>
+		<option>
+			<name>Float</name>
+			<key>float</key>
+			<opt>size:gr.sizeof_float</opt>
+		</option>
+		<option>
+			<name>Int</name>
+			<key>int</key>
+			<opt>size:gr.sizeof_int</opt>
+		</option>
+		<option>
+			<name>Short</name>
+			<key>short</key>
+			<opt>size:gr.sizeof_short</opt>
+		</option>
+		<option>
+			<name>Byte</name>
+			<key>byte</key>
+			<opt>size:gr.sizeof_char</opt>
+		</option>
+	</param>
+  <param>
+    <name>Start tag</name>
+    <key>tag_start</key>
+    <type>string</type>
+  </param>
+  <param>
+    <name>End tag</name>
+    <key>tag_end</key>
+    <type>string</type>
+  </param>
+	<param>
+		<name>Vec Length</name>
+		<key>vlen</key>
+		<value>1</value>
+		<type>int</type>
+	</param>
+	<check>$vlen &gt; 0</check>
+  <sink>
+    <name>out</name>
+    <type>$type</type>
+    <vlen>$type.size*$vlen</vlen>
+  </sink>
+</block>
