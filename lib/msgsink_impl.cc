@@ -79,12 +79,17 @@ namespace gr {
 			std::vector<tag_t> start_tags;
 			std::vector<tag_t> end_tags;
 			size_t i,	prev, spl_cnt;
-			int oo = 0, ii, stid=0, etid=0, of;
+			int ii, of;
 			message::sptr msg;
+			std::vector<tag_t>::iterator sit;
+			std::vector<tag_t>::iterator eit;
 
 			MSGSINK_DBG("work (%d - %d)\n", nitems_read(0), nitems_read(0)+noutput_items);
 			get_tags_in_range(start_tags, 0, nitems_read(0), nitems_read(0)+noutput_items, d_tag_start);
 			get_tags_in_range(end_tags, 0, nitems_read(0), nitems_read(0)+noutput_items, d_tag_end);
+
+			sit = start_tags.begin();
+			eit = end_tags.begin();
 
 			MSGSINK_DBG("%d tags start\n", start_tags.size());
 
@@ -92,32 +97,42 @@ namespace gr {
 			{
 				if(d_state == ST_WAIT)
 				{
-					if (stid >= start_tags.size()){
-					/* No start tag in this window. Nothing to do*/
-						return noutput_items;
+					while (1){
+						if (sit == start_tags.end()){
+						/* No start tag in this window. Nothing to do*/
+							return noutput_items;
+						}
+						of = sit->offset - nitems_read(0);
+						sit++;
+						/* ignore nested start tags */
+						if (of >= ii)
+							break;
 					}
 					/* Found start of new packet */
-					of = start_tags[stid++].offset - nitems_read(0);
 					MSGSINK_DBG("start packet at %d (%d)\n", of, of+nitems_read(0));
-					if (ii && ii < of){
-						throw std::runtime_error("1: of != ii");
-					}
 					d_state = ST_RX;
 					ii = of;
 				}
 				if (d_state == ST_RX)
 				{
-					if (etid >= end_tags.size()){
-						/* No End tag in this window. Bufferize all window and wait for more */
-						add_to_buf(&in[ii], noutput_items - ii);
-						return noutput_items;
+					of = 0;
+					while (1){
+						if (eit == end_tags.end()){
+							/* No End tag in this window. Bufferize all window and wait for more */
+							add_to_buf(&in[ii], noutput_items - ii);
+							return noutput_items;
+						}
+						/* Found end of current packet */
+						of = eit->offset - nitems_read(0);
+						eit++;
+						/* Ignore trailing end tags */
+						if (of > ii)
+							break;
 					}
-					/* Found end of current packet */
-					of = end_tags[etid++].offset - nitems_read(0);
 					MSGSINK_DBG("end packet at of %d (%d)\n", of, of+nitems_read(0));
 					if (of < ii)
 						throw std::runtime_error("2: of < ii");
-					of ++;
+					of++;
 					/* Add end of packet to buffer */
 					add_to_buf(&in[ii], of - ii);
 					/* Send the message */
